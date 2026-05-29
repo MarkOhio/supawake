@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – SupaWake</title>
+  <meta name="description" content="Learn how SupaWake keeps your Supabase free-tier projects awake, how to verify pings with SQL, and how your data is kept private and secure." />
+  <meta name="robots" content="index, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#080c10; --surface:#0e1419; --surface2:#141c24; --border:#1e2d3d;
+      --accent:#3ecf8e; --accent2:#0d9e64; --text:#e8f0f8; --muted:#5a7a96;
+      --error:#f56565; --warning:#f6ad55;
+      --fhead:'Syne',sans-serif; --fmono:'DM Mono',monospace; --r:10px;
+    }
+    html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:var(--fmono); font-size:14px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+
+    /* NAV */
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--border); background:rgba(8,12,16,.85); backdrop-filter:blur(12px); position:sticky; top:0; z-index:10; }
+    .nav-logo { font-family:var(--fhead); font-size:20px; font-weight:800; letter-spacing:-.5px; text-decoration:none; color:var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:8px; }
+    .nav-link { font-size:12px; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:6px; transition:color .15s; }
+    .nav-link:hover { color:var(--text); }
+    .nav-cta { font-size:12px; font-family:var(--fhead); font-weight:700; background:var(--accent); color:#050f09; text-decoration:none; padding:6px 14px; border-radius:6px; transition:background .15s; }
+    .nav-cta:hover { background:#5fffab; }
+
+    /* LAYOUT */
+    .page { max-width:720px; margin:0 auto; padding:60px 20px 140px; position:relative; z-index:1; animation:fadeIn .5s ease; }
+
+    /* HERO */
+    .page-hero { margin-bottom:60px; }
+    .page-tag { font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+    .page-title { font-family:var(--fhead); font-size:clamp(28px,5vw,44px); font-weight:800; line-height:1.1; letter-spacing:-1px; margin-bottom:16px; }
+    .page-sub { color:var(--muted); font-size:15px; max-width:540px; line-height:1.8; }
+
+    /* SECTIONS */
+    .section { margin-bottom:56px; }
+    h2 { font-family:var(--fhead); font-size:20px; font-weight:700; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+    h3 { font-family:var(--fhead); font-size:15px; font-weight:700; color:var(--accent); margin:24px 0 8px; }
+    p { color:var(--muted); margin-bottom:14px; font-size:14px; line-height:1.8; }
+    p strong { color:var(--text); font-weight:500; }
+
+    /* STEPS */
+    .steps { display:grid; gap:16px; }
+    .step { display:flex; gap:16px; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; }
+    .step-num { font-family:var(--fhead); font-size:22px; font-weight:800; color:var(--accent); flex-shrink:0; line-height:1; margin-top:2px; }
+    .step-content h4 { font-family:var(--fhead); font-size:14px; font-weight:700; margin-bottom:5px; }
+    .step-content p { margin:0; font-size:13px; }
+
+    /* SQL BLOCK */
+    .sql-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin:20px 0; }
+    .sql-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border); background:var(--surface2); }
+    .sql-label { font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+    .copy-btn { font-size:11px; color:var(--accent); background:transparent; border:1px solid rgba(62,207,142,.3); padding:3px 10px; border-radius:5px; cursor:pointer; font-family:var(--fmono); transition:background .15s; }
+    .copy-btn:hover { background:rgba(62,207,142,.1); }
+    .sql-body { padding:20px; overflow-x:auto; }
+    .sql-body pre { font-family:var(--fmono); font-size:13px; line-height:1.8; color:var(--text); white-space:pre; }
+    .kw  { color:#79c0ff; } /* SQL keyword */
+    .fn  { color:#d2a8ff; } /* function */
+    .col { color:#3ecf8e; } /* column/table */
+    .cm  { color:#8b949e; font-style:italic; } /* comment */
+    .str { color:#a5d6ff; } /* string */
+
+    /* EXPLAIN TABLE */
+    .explain-table { width:100%; border-collapse:collapse; margin:20px 0; font-size:13px; }
+    .explain-table th { text-align:left; padding:10px 14px; border-bottom:2px solid var(--border); font-family:var(--fhead); font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .explain-table td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted); vertical-align:top; }
+    .explain-table td:first-child { color:var(--accent); font-weight:500; white-space:nowrap; }
+    .explain-table tr:last-child td { border-bottom:none; }
+
+    /* RESULT PREVIEW */
+    .result-preview { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px; margin:16px 0; overflow-x:auto; }
+    .result-preview p { margin:0; font-size:12px; color:var(--muted); }
+    .result-row { display:grid; grid-template-columns:60px 1fr 80px 120px; gap:16px; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; align-items:center; }
+    .result-row:last-child { border-bottom:none; }
+    .result-row.header { color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px; }
+    .result-row.data { color:var(--text); }
+    .result-row .ok { color:var(--accent); }
+
+    /* SECURITY CARDS */
+    .security-grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+    .sec-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px; }
+    .sec-card .sec-icon { font-size:24px; margin-bottom:10px; }
+    .sec-card h4 { font-family:var(--fhead); font-size:14px; font-weight:700; margin-bottom:8px; }
+    .sec-card p { font-size:13px; margin:0; }
+
+    /* AD */
+    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; }
+    #ad-banner .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:13px; padding:10px 20px; border-radius:8px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; white-space:nowrap; z-index:999; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.success { border-color:var(--accent); color:var(--accent); }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Supa<span>Wake</span></a>
+  <div class="nav-links">
+    <a href="privacy.html" class="nav-link">Privacy</a>
+    <a href="terms.html" class="nav-link">Terms</a>
+    <a href="index.html" class="nav-cta">Open App</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-hero">
+    <div class="page-tag">About SupaWake</div>
+    <h1 class="page-title">How it works — every part explained.</h1>
+    <p class="page-sub">SupaWake is a free, open-source tool that keeps your Supabase free-tier projects alive automatically. No server needed. No paid plan required. This page explains everything in plain language.</p>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <div class="section">
+    <h2>The problem SupaWake solves</h2>
+    <p>Supabase offers a generous free tier — but there is a catch. If no database activity occurs for <strong>7 consecutive days</strong>, Supabase automatically pauses your entire project. That means your users get a broken app: sign-ups fail, logins fail, data cannot be read or written.</p>
+    <p>When someone visits your project link — a recruiter, a client, a friend — and tries to create an account, they get an error. They do not know about Supabase's pause mechanism. They just see a broken app. And they move on.</p>
+    <p>SupaWake solves this by sending a lightweight authenticated request directly to your Supabase database API every 5 days. That counts as real activity, the inactivity clock resets, and your project never pauses.</p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <h2>How SupaWake works — step by step</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>You sign in with Google</h4>
+          <p>Your account is created instantly via Firebase Authentication. No password. No email verification. Your unique Google account ID is used to keep your projects private from other users.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>You add your Supabase project</h4>
+          <p>You paste your Supabase project URL (e.g. <em>https://xyzabc.supabase.co</em>) and your anon key. These are stored in Firebase Firestore, linked only to your account. No other user can see or access them.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>GitHub Actions pings it every 5 days</h4>
+          <p>A scheduled workflow runs automatically every 5 days. It reads your project list from Firestore and sends a GET request to each Supabase REST endpoint. Supabase logs this as activity and resets the 7-day clock. The status of each project is then updated in your dashboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>You can also ping manually at any time</h4>
+          <p>The <strong>Ping Now</strong> button on each project card triggers an immediate ping directly from your browser. You can use this once per day per project. The automatic schedule runs independently — manual pings do not affect the 5-day automatic cycle.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PING NOW -->
+  <div class="section">
+    <h2>Using the Ping Now button</h2>
+    <p>The <strong>⚡ Ping Now</strong> button lets you instantly send a keepalive request to your Supabase project without waiting for the automatic schedule. It is useful when you are about to share a project link with someone and want to make sure the database is confirmed awake.</p>
+    <h3>Rate limit</h3>
+    <p>You can use Ping Now <strong>once per day per project</strong>. If you try again within 24 hours, SupaWake will tell you how many hours are left. This is to prevent accidental spam to your own database.</p>
+    <h3>What happens when you click it</h3>
+    <p>Your browser sends a GET request to your Supabase REST API with your anon key in the header. Supabase processes the request, logs it internally, and responds with a status code. SupaWake reads that code and updates your project status to <em>Awake</em> or <em>Error</em>.</p>
+  </div>
+
+  <!-- VERIFY WITH SQL -->
+  <div class="section">
+    <h2>Verify that a ping worked — SQL guide</h2>
+    <p>If you want to confirm that SupaWake's pings are actually reaching your Supabase database, you can run a query in your Supabase SQL Editor. Here is how.</p>
+
+    <h3>Step 1 — Open Supabase SQL Editor</h3>
+    <p>Go to <strong>app.supabase.com</strong> → open your project → click <strong>SQL Editor</strong> in the left sidebar → click <strong>New query</strong>.</p>
+
+    <h3>Step 2 — Run this query</h3>
+
+    <div class="sql-card">
+      <div class="sql-header">
+        <span class="sql-label">SQL — Supabase SQL Editor</span>
+        <button class="copy-btn" onclick="copySQL()">Copy</button>
+      </div>
+      <div class="sql-body">
+        <pre id="sql-code"><span class="kw">SELECT</span>
+  <span class="col">id</span>,
+  <span class="col">method</span>,
+  <span class="col">path</span>,
+  <span class="col">response_status</span>,
+  <span class="col">created_at</span>
+<span class="kw">FROM</span> <span class="col">net._http_response</span>
+<span class="kw">WHERE</span> <span class="col">created_at</span> &gt; <span class="fn">now</span>() - <span class="fn">interval</span> <span class="str">'7 days'</span>
+<span class="kw">ORDER BY</span> <span class="col">created_at</span> <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="str">20</span>;</pre>
+      </div>
+    </div>
+
+    <h3>Step 3 — Read the results</h3>
+    <p>The query returns a table like this. A SupaWake ping will appear as a row with <em>response_status 200</em> or <em>204</em>:</p>
+
+    <div class="result-preview">
+      <div class="result-row header">
+        <span>id</span><span>path</span><span>status</span><span>created_at</span>
+      </div>
+      <div class="result-row data">
+        <span>1</span><span>/rest/v1/</span><span class="ok">200</span><span>2025-06-01 08:03</span>
+      </div>
+      <div class="result-row data">
+        <span>2</span><span>/rest/v1/</span><span class="ok">200</span><span>2025-05-27 08:02</span>
+      </div>
+    </div>
+
+    <h3>What every part of this SQL means</h3>
+    <table class="explain-table">
+      <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>SELECT</td><td>Chooses which columns to return. We are selecting the row ID, HTTP method, URL path, response status code, and the timestamp of the request.</td></tr>
+        <tr><td>FROM net._http_response</td><td>This is a built-in Supabase internal table that logs all HTTP requests made to your project's REST API. You are not accessing anyone else's data — only your own project's logs.</td></tr>
+        <tr><td>WHERE created_at > now() - interval '7 days'</td><td>Filters results to only show activity from the last 7 days so the results are relevant and readable. You can change '7 days' to '30 days' if you want to see further back.</td></tr>
+        <tr><td>ORDER BY created_at DESC</td><td>Sorts results so the most recent ping appears at the top of the table.</td></tr>
+        <tr><td>LIMIT 20</td><td>Returns a maximum of 20 rows. This prevents the query from returning thousands of rows if your database has a lot of activity. You can increase this number if needed.</td></tr>
+        <tr><td>response_status 200 or 204</td><td>These are HTTP success codes. 200 means "OK — the request was received and processed". 204 means "No Content — the request was received successfully but there is no data to return". Both confirm the ping worked.</td></tr>
+      </tbody>
+    </table>
+
+    <p>This query is read-only. It does not modify any data, does not grant access to anything, and does not expose any information beyond your own project's request logs. It is equivalent to checking your own server access logs.</p>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="section">
+    <h2>Security — how your data is protected</h2>
+    <div class="security-grid">
+      <div class="sec-card">
+        <div class="sec-icon">🔐</div>
+        <h4>Firebase Authentication</h4>
+        <p>You must be signed in to access anything. Anonymous access to Firestore is blocked entirely by the security rules. Nobody can read the database without a valid Google account session.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🛡️</div>
+        <h4>Firestore Security Rules</h4>
+        <p>Every project document is tagged with your unique Google account ID. The Firestore rules reject any query where the requesting user's ID does not match the document owner's ID. You physically cannot see another user's projects — the request is blocked at the server level before any data is returned.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🔑</div>
+        <h4>Anon Key is safe to store</h4>
+        <p>The Supabase anon key is designed to be public. It is embedded in every Supabase frontend app — including yours. Real security comes from Row Level Security policies on your tables, not from keeping the anon key hidden.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">⚠️</div>
+        <h4>Never store your service_role key</h4>
+        <p>The service_role key bypasses Row Level Security entirely. SupaWake explicitly warns against entering it and will flag it if detected. Only ever paste your anon key into SupaWake.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEN SOURCE -->
+  <div class="section">
+    <h2>Open source &amp; transparent</h2>
+    <p>SupaWake is fully open source. Every line of code — the frontend, the GitHub Actions workflow, the Firestore rules — is visible in the public repository. You can inspect exactly what happens when a ping is sent and verify that nothing beyond a simple HTTP request is made to your Supabase project.</p>
+    <p>Found a bug or have a feature idea? Open an issue or pull request on GitHub.</p>
+  </div>
+
+</div>
+
+<div id="ad-banner">
+  <span class="ad-label">Advertisement</span>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  function copySQL() {
+    const raw = `SELECT\n  id,\n  method,\n  path,\n  response_status,\n  created_at\nFROM net._http_response\nWHERE created_at > now() - interval '7 days'\nORDER BY created_at DESC\nLIMIT 20;`;
+    navigator.clipboard.writeText(raw).then(() => {
+      const t = document.getElementById("toast");
+      t.textContent = "✓ SQL copied to clipboard";
+      t.className = "toast show success";
+      setTimeout(() => t.className = "toast", 2500);
+    });
+  }
+</script>
+</body>
+</html>

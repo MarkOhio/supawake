@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy – SupaWake</title>
+  <meta name="description" content="SupaWake Privacy Policy — what data we collect, how we use it, and how we protect it." />
+  <meta name="robots" content="index, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080c10; --surface:#0e1419; --border:#1e2d3d; --accent:#3ecf8e; --text:#e8f0f8; --muted:#5a7a96; --fhead:'Syne',sans-serif; --fmono:'DM Mono',monospace; --r:10px; }
+    html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:var(--fmono); font-size:14px; line-height:1.8; -webkit-font-smoothing:antialiased; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--border); background:rgba(8,12,16,.85); backdrop-filter:blur(12px); position:sticky; top:0; z-index:10; }
+    .nav-logo { font-family:var(--fhead); font-size:20px; font-weight:800; letter-spacing:-.5px; text-decoration:none; color:var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:8px; }
+    .nav-link { font-size:12px; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:6px; transition:color .15s; }
+    .nav-link:hover { color:var(--text); }
+    .nav-cta { font-size:12px; font-family:var(--fhead); font-weight:700; background:var(--accent); color:#050f09; text-decoration:none; padding:6px 14px; border-radius:6px; }
+    .page { max-width:680px; margin:0 auto; padding:60px 20px 140px; position:relative; z-index:1; animation:fadeIn .5s ease; }
+    .page-tag { font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+    .page-title { font-family:var(--fhead); font-size:clamp(26px,4vw,38px); font-weight:800; line-height:1.1; letter-spacing:-1px; margin-bottom:10px; }
+    .last-updated { font-size:12px; color:var(--muted); margin-bottom:50px; }
+    .section { margin-bottom:44px; }
+    h2 { font-family:var(--fhead); font-size:17px; font-weight:700; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    p { color:var(--muted); margin-bottom:12px; font-size:14px; }
+    p strong { color:var(--text); font-weight:500; }
+    ul { color:var(--muted); font-size:14px; padding-left:20px; margin-bottom:12px; }
+    ul li { margin-bottom:6px; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; }
+    #ad-banner .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Supa<span>Wake</span></a>
+  <div class="nav-links">
+    <a href="about.html" class="nav-link">About</a>
+    <a href="terms.html" class="nav-link">Terms</a>
+    <a href="index.html" class="nav-cta">Open App</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-tag">Legal</div>
+  <h1 class="page-title">Privacy Policy</h1>
+  <div class="last-updated">Last updated: June 2025</div>
+
+  <div class="section">
+    <h2>1. Overview</h2>
+    <p>SupaWake ("we", "us", "our") is a free, open-source web application that helps developers keep their Supabase free-tier projects active. This Privacy Policy explains what information we collect when you use SupaWake, how we use it, and how we protect it.</p>
+    <p>By using SupaWake, you agree to the collection and use of information as described in this policy.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Information we collect</h2>
+    <p><strong>Account information.</strong> When you sign in with Google, Firebase Authentication receives your Google account name, email address, and profile photo URL. We do not store your password — authentication is handled entirely by Google.</p>
+    <p><strong>Project data.</strong> When you add a Supabase project, we store the following in Firebase Firestore, linked to your account:</p>
+    <ul>
+      <li>Your Supabase project URL (e.g. https://xyzabc.supabase.co)</li>
+      <li>Your Supabase anon key (the public API key — not your service_role key)</li>
+      <li>An optional label you provide for the project</li>
+      <li>Timestamps of when projects were added and last pinged</li>
+      <li>Project status (Awake, Pending, or Error)</li>
+    </ul>
+    <p><strong>We do not collect</strong> passwords, payment information, location data, device identifiers, or any information beyond what is listed above.</p>
+  </div>
+
+  <div class="section">
+    <h2>3. How we use your information</h2>
+    <p>We use the information you provide solely to deliver the SupaWake service:</p>
+    <ul>
+      <li>Your Google account ID is used to keep your projects private and separate from other users' data.</li>
+      <li>Your Supabase project URL and anon key are used exclusively to send keepalive requests to your database every 5 days (and when you trigger a manual ping).</li>
+      <li>Timestamps are used to display last pinged times in your dashboard and to enforce the once-per-day rate limit on manual pings.</li>
+    </ul>
+    <p>We do not sell your data, share it with third parties for marketing, or use it for any purpose beyond operating the SupaWake service.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Data storage and security</h2>
+    <p>Your project data is stored in <strong>Firebase Firestore</strong>, a cloud database operated by Google. Access is protected by Firestore Security Rules that enforce the following: only the authenticated user who created a project document can read, update, or delete it. No other user — including us — can access your project data through the application interface.</p>
+    <p>The automated pinging is performed by a GitHub Actions workflow that reads project data from Firestore using a service account with read-only access to the projects collection.</p>
+    <p>While we implement reasonable security measures, no system is perfectly secure. We encourage you to never store sensitive credentials (such as your Supabase service_role key) in SupaWake.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Third-party services</h2>
+    <p>SupaWake uses the following third-party services:</p>
+    <ul>
+      <li><strong>Firebase (Google)</strong> — authentication and database storage. Subject to <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase's Privacy Policy</a>.</li>
+      <li><strong>GitHub Actions</strong> — automated scheduled pinging. Subject to <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank">GitHub's Privacy Policy</a>.</li>
+      <li><strong>Google AdSense</strong> — advertising displayed on the site. Google may use cookies to serve ads based on prior visits to SupaWake or other sites. Subject to <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>. You can opt out at <a href="https://adssettings.google.com" target="_blank">adssettings.google.com</a>.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>6. Cookies</h2>
+    <p>SupaWake itself does not set cookies directly. Firebase Authentication uses browser storage (IndexedDB or localStorage) to maintain your login session across visits. Google AdSense may set cookies for advertising purposes as described in section 5.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Data retention and deletion</h2>
+    <p>Your data is retained in Firestore for as long as your account exists. You can delete individual projects at any time from your dashboard. To request full deletion of your account and all associated data, contact us at the email address below. We will process deletion requests within 30 days.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Children's privacy</h2>
+    <p>SupaWake is intended for developers and is not directed at children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us and we will delete it promptly.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Changes to this policy</h2>
+    <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Continued use of SupaWake after changes constitutes acceptance of the updated policy.</p>
+  </div>
+
+  <div class="section">
+    <h2>10. Contact</h2>
+    <p>If you have questions about this Privacy Policy or want to request data deletion, contact us via the SupaWake GitHub repository or at the email address listed there.</p>
+  </div>
+</div>
+
+<div id="ad-banner">
+  <span class="ad-label">Advertisement</span>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service – SupaWake</title>
+  <meta name="description" content="SupaWake Terms of Service — the rules and conditions for using the SupaWake keepalive service." />
+  <meta name="robots" content="index, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root { --bg:#080c10; --surface:#0e1419; --border:#1e2d3d; --accent:#3ecf8e; --text:#e8f0f8; --muted:#5a7a96; --fhead:'Syne',sans-serif; --fmono:'DM Mono',monospace; }
+    html,body { min-height:100%; background:var(--bg); color:var(--text); font-family:var(--fmono); font-size:14px; line-height:1.8; -webkit-font-smoothing:antialiased; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--border); background:rgba(8,12,16,.85); backdrop-filter:blur(12px); position:sticky; top:0; z-index:10; }
+    .nav-logo { font-family:var(--fhead); font-size:20px; font-weight:800; letter-spacing:-.5px; text-decoration:none; color:var(--text); }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:8px; }
+    .nav-link { font-size:12px; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:6px; transition:color .15s; }
+    .nav-link:hover { color:var(--text); }
+    .nav-cta { font-size:12px; font-family:var(--fhead); font-weight:700; background:var(--accent); color:#050f09; text-decoration:none; padding:6px 14px; border-radius:6px; }
+    .page { max-width:680px; margin:0 auto; padding:60px 20px 140px; position:relative; z-index:1; animation:fadeIn .5s ease; }
+    .page-tag { font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+    .page-title { font-family:var(--fhead); font-size:clamp(26px,4vw,38px); font-weight:800; line-height:1.1; letter-spacing:-1px; margin-bottom:10px; }
+    .last-updated { font-size:12px; color:var(--muted); margin-bottom:50px; }
+    .section { margin-bottom:44px; }
+    h2 { font-family:var(--fhead); font-size:17px; font-weight:700; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    p { color:var(--muted); margin-bottom:12px; font-size:14px; }
+    p strong { color:var(--text); font-weight:500; }
+    ul { color:var(--muted); font-size:14px; padding-left:20px; margin-bottom:12px; }
+    ul li { margin-bottom:6px; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; }
+    #ad-banner .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Supa<span>Wake</span></a>
+  <div class="nav-links">
+    <a href="about.html" class="nav-link">About</a>
+    <a href="privacy.html" class="nav-link">Privacy</a>
+    <a href="index.html" class="nav-cta">Open App</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-tag">Legal</div>
+  <h1 class="page-title">Terms of Service</h1>
+  <div class="last-updated">Last updated: June 2025</div>
+
+  <div class="section">
+    <h2>1. Acceptance of terms</h2>
+    <p>By accessing or using SupaWake ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service. SupaWake is provided free of charge and is operated as an open-source project.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Description of service</h2>
+    <p>SupaWake is a web application that helps developers prevent their Supabase free-tier database projects from being paused due to inactivity. The Service works by sending periodic authenticated HTTP requests (pings) to Supabase REST API endpoints on behalf of registered users.</p>
+    <p>SupaWake is an independent tool and is not affiliated with, endorsed by, or in any way officially connected to Supabase, Inc.</p>
+  </div>
+
+  <div class="section">
+    <h2>3. Eligibility</h2>
+    <p>You must be at least 13 years of age to use SupaWake. By using the Service, you represent that you meet this requirement. If you are using SupaWake on behalf of an organisation, you represent that you have the authority to bind that organisation to these Terms.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. User responsibilities</h2>
+    <p>You are responsible for:</p>
+    <ul>
+      <li>Providing accurate Supabase project URLs and anon keys</li>
+      <li>Ensuring you have the right to register the Supabase projects you add to SupaWake</li>
+      <li>Keeping your Google account credentials secure</li>
+      <li>Complying with Supabase's own Terms of Service when using SupaWake to interact with your Supabase projects</li>
+    </ul>
+    <p><strong>You must not</strong> use SupaWake to send requests to Supabase projects you do not own or have permission to manage, to attempt to circumvent Supabase's rate limiting or abuse policies, or to use the Service for any unlawful purpose.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. API keys and credentials</h2>
+    <p>You are solely responsible for the credentials you enter into SupaWake. We strongly advise that you only ever enter your Supabase <strong>anon key</strong> (the public API key). Never enter your <strong>service_role key</strong>, which carries administrative privileges and bypasses Row Level Security.</p>
+    <p>SupaWake uses your credentials solely to send keepalive requests to your Supabase project. We do not use your credentials for any other purpose.</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Service availability</h2>
+    <p>SupaWake is provided on an "as is" and "as available" basis. We do not guarantee that the Service will be uninterrupted, error-free, or that pings will always succeed. Factors outside our control — including Supabase infrastructure changes, GitHub Actions availability, and Firebase service interruptions — may affect Service operation.</p>
+    <p><strong>SupaWake does not guarantee that your Supabase project will never pause.</strong> It significantly reduces the likelihood, but we accept no liability if a project pauses despite the Service being active.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Limitation of liability</h2>
+    <p>To the fullest extent permitted by law, SupaWake and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages — including loss of data, loss of revenue, or loss of business — arising from your use of or inability to use the Service.</p>
+    <p>Our total liability to you for any claim arising from these Terms or your use of the Service shall not exceed the amount you paid for the Service, which in most cases is zero.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Intellectual property</h2>
+    <p>SupaWake is open-source software. The source code is available on GitHub and is licensed under the MIT License. You are free to fork, modify, and redistribute the code in accordance with that license.</p>
+    <p>The SupaWake name and branding are not covered by the MIT License and may not be used to represent derivative projects without permission.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Termination</h2>
+    <p>You may stop using SupaWake at any time. You can delete your projects from the dashboard and your data will be removed from Firestore. To request full account deletion, see our <a href="privacy.html">Privacy Policy</a>.</p>
+    <p>We reserve the right to suspend or terminate access to the Service for any user who violates these Terms, abuses the Service, or uses it in a way that negatively affects other users or third-party services.</p>
+  </div>
+
+  <div class="section">
+    <h2>10. Changes to these terms</h2>
+    <p>We may update these Terms of Service from time to time. Updated terms will be posted on this page with a revised date. Continued use of SupaWake after changes are posted constitutes your acceptance of the updated terms.</p>
+  </div>
+
+  <div class="section">
+    <h2>11. Governing law</h2>
+    <p>These Terms are governed by and construed in accordance with applicable law. Any disputes arising from these Terms or your use of SupaWake shall be resolved through good-faith negotiation before any formal legal proceedings are initiated.</p>
+  </div>
+
+  <div class="section">
+    <h2>12. Contact</h2>
+    <p>For questions about these Terms, contact us via the SupaWake GitHub repository.</p>
+  </div>
+</div>
+
+<div id="ad-banner">
+  <span class="ad-label">Advertisement</span>
+</div>
+</body>
+</html>

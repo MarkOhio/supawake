@@ -42,6 +42,9 @@
     #diagnostic-toggle { width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(62,207,142,.35); background: rgba(62,207,142,.14); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 18px 40px rgba(0,0,0,.25); transition: transform .15s, box-shadow .15s; }
     #diagnostic-toggle:hover { transform: translateY(-2px); }
     #diagnostic-panel { width: 360px; max-width: calc(100vw - 32px); max-height: 360px; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+    .diagnostic-panel { display: none; }
+    .diagnostic-panel.open { display: block; }
+    #diagnostic-toggle.hidden { visibility: hidden; }
     #diagnostic-panel.hidden { display: none; }
     #diagnostic-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 10px; cursor: grab; user-select: none; }
     #diagnostic-header:active { cursor: grabbing; }
@@ -172,10 +175,11 @@
     #empty-state p { font-size:13px; line-height:1.7; }
 
     /* ── MODAL ── */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .2s; }
-    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .2s; }
+    .modal-overlay.open { display:flex; opacity:1; pointer-events:all; }
     .modal { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; max-width:400px; width:100%; transform:translateY(16px) scale(.97); transition:transform .2s; }
     .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+    .setup-modal .modal { max-height:90vh; overflow-y:auto; }
     .modal-icon { font-size:32px; margin-bottom:14px; }
     .modal-title { font-family:var(--fhead); font-size:18px; font-weight:700; margin-bottom:8px; }
     .modal-body { font-size:13px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
@@ -185,7 +189,7 @@
     .modal-confirm { background:var(--error); color:#fff; font-family:var(--fhead); font-size:13px; font-weight:700; padding:8px 18px; border-radius:7px; border:none; cursor:pointer; transition:opacity .15s; }
     .modal-confirm:hover { opacity:.85; }
 
-    .setup-modal .modal { max-width:640px; padding:32px; }
+    .setup-modal .modal { max-width:640px; padding:32px; max-height:90vh; overflow-y:auto; }
     .setup-modal .modal-title { font-size:20px; }
     .setup-modal .modal-subtitle { color:var(--muted); margin-bottom:18px; }
     .setup-modal .setup-steps { display:grid; gap:10px; margin:18px 0 22px; }
@@ -194,7 +198,7 @@
     .setup-sql-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
     .setup-sql-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); background:var(--surface2); }
     .setup-sql-header .sql-label { font-size:11px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
-    .setup-code { padding:18px; font-family:var(--fmono); font-size:13px; line-height:1.7; color:var(--text); background:#071014; overflow-x:auto; }
+    .setup-code { padding:18px; font-family:var(--fmono); font-size:13px; line-height:1.7; color:var(--text); background:#071014; overflow-x:auto; max-height:200px; overflow-y:auto; }
     .setup-copy-btn { background:transparent; border:1px solid rgba(62,207,142,.3); color:var(--accent); font-family:var(--fmono); font-size:11px; padding:6px 12px; border-radius:7px; cursor:pointer; }
     .setup-copy-btn:hover { background:rgba(62,207,142,.08); }
     .setup-status { display:flex; align-items:center; gap:10px; margin:22px 0 18px; font-size:13px; }
@@ -216,7 +220,7 @@
     .toast.info    { border-color:var(--warning); color:var(--warning); }
 
     /* ── AD BANNER ── */
-    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; }
+    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; overflow:none; }
     #ad-banner .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
 
     /* ── ANIMATIONS ── */
@@ -375,38 +379,37 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
 
 <!-- ══ AD BANNER ══ -->
 <div id="ad-banner">
-        <div class="setup-code" id="setup-sql-code"><pre>CREATE OR REPLACE FUNCTION public.supawake_ping()
-RETURNS json
-LANGUAGE sql
-SECURITY DEFINER
-AS $$
-  SELECT json_build_object('status', 'ok', 'ts', now());
-$$;
-
-GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
+  <span class="ad-label">Advertisement whala</span>
+  <!-- Google AdSense tag goes here -->
 </div>
 
 <div id="toast" class="toast"></div>
 
-<div id="diagnostic-widget">
-  <button id="diagnostic-toggle" aria-label="Open diagnostics">⚡</button>
-  <div id="diagnostic-panel" hidden>
+    <div id="diagnostic-widget">
+      <button id="diagnostic-toggle" aria-label="Open diagnostics">⚡</button>
+      <div id="diagnostic-panel" class="diagnostic-panel">
     <div id="diagnostic-header">
       <strong>Network diagnostics</strong>
       <button id="diagnostic-close" aria-label="Close diagnostics">×</button>
     </div>
-<!-- ══ DELETE MODAL ══ -->
-<div class="modal-overlay" id="delete-modal">
-  <div class="modal">
-    <div class="modal-icon">🗑️</div>
-    <div class="modal-title">Remove this project?</div>
-    <div class="modal-body">SupaWake will stop pinging this Supabase project. Your actual Supabase project is not affected — only the keepalive is removed.</div>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-confirm" id="modal-confirm-btn">Remove</button>
+    <div id="diagnostic-body">
+      <button id="diagnostic-run" type="button">Run tests</button>
+      <ul id="diagnostic-list"></ul>
+      <div id="diagnostic-hint">Tap the button to open diagnostics, drag the header to move it, and close when you’re done.</div>
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const explanations = [
+      { match: /CORS policy/i, text: "The browser blocked the response because the endpoint did not allow access from this origin. This is usually a cross-origin restriction, not a problem with your connection." },
+      { match: /No 'Access-Control-Allow-Origin'/i, text: "The response is missing the header needed to allow this page to read it. This is a CORS issue." },
+      { match: /Failed to fetch/i, text: "The request was blocked or the endpoint did not respond. It may be unreachable, blocked, or a browser restriction." },
+      { match: /403.*Forbidden|Forbidden/i, text: "The server rejected the request. Usually the key or permissions are invalid, or the service does not allow this call." },
+      { match: /404.*Not Found|Not Found/i, text: "The requested address was not found. Check the URL or the endpoint path." },
+      { match: /unauthorized-domain/i, text: "This origin (site) is not authorized in your Firebase project's Authentication settings. Add your domain under Firebase Console → Authentication → Authorized domains." },
+      { match: /401.*Unauthorized|Unauthorized/i, text: "The request is not authorized. The key may be wrong, expired, or not allowed to access this resource." },
       { match: /400.*Bad Request|Bad Request/i, text: "The request is malformed. Check the URL, headers, and request format." }
     ];
 
@@ -444,15 +447,14 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
       return li;
     }
 
-      // Allow other parts of the app to push diagnostics into the widget
-      window.reportDiagnostic = function(name, ok, message) {
-        try {
-          // ok true => success, false => error, other => pending
-          addItem(name, ok === true ? true : ok === false ? false : 'pending', message || '');
-        } catch (e) {
-          console.warn('reportDiagnostic failed', e);
-        }
-      };
+    // Allow other parts of the app to push diagnostics into the widget
+    window.reportDiagnostic = function(name, ok, message) {
+      try {
+        addItem(name, ok === true ? true : ok === false ? false : 'pending', message || '');
+      } catch (e) {
+        console.warn('reportDiagnostic failed', e);
+      }
+    };
 
     async function testUrl(name, url, timeout = 9000) {
       addItem(name, 'pending', 'Testing…');
@@ -491,14 +493,14 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
     }
 
     toggle.addEventListener('click', () => {
-      panel.hidden = false;
-      toggle.hidden = true;
+      panel.classList.add('open');
+      toggle.classList.add('hidden');
       setTimeout(runAll, 200);
     });
 
     closeBtn.addEventListener('click', () => {
-      panel.hidden = true;
-      toggle.hidden = false;
+      panel.classList.remove('open');
+      toggle.classList.remove('hidden');
       widget.style.left = 'auto';
       widget.style.top = 'auto';
       widget.style.right = '16px';
@@ -512,7 +514,6 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
     let originY = 0;
 
     header.addEventListener('pointerdown', event => {
-      // Ignore pointerdown when clicking interactive elements inside header
       if (event.target && event.target.closest && event.target.closest('button')) return;
       dragging = true;
       startX = event.clientX;

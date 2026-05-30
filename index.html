@@ -23,10 +23,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 
+ 
+  <style>
+    html { scroll-behavior: smooth; }
+    html::-webkit-scrollbar { width: 10px; height: 10px; }
+    html::-webkit-scrollbar-track { background: #0e1419; border-radius: 999px; }
+    html::-webkit-scrollbar-thumb { background: rgba(62,207,142,.25); border-radius: 999px; border: 2px solid #0e1419; }
+    html::-webkit-scrollbar-thumb:hover { background: rgba(62,207,142,.35); }
+    html { scrollbar-width: thin; scrollbar-color: rgba(62,207,142,.25) #0e1419; }
+
+    #diagnostic-widget { position: fixed; right: 16px; bottom: 16px; z-index: 9999; width: auto; max-width: 360px; font-size: 13px; }
+    #diagnostic-toggle { width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(62,207,142,.35); background: rgba(62,207,142,.14); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 18px 40px rgba(0,0,0,.25); transition: transform .15s, box-shadow .15s; }
+    #diagnostic-toggle:hover { transform: translateY(-2px); }
+    #diagnostic-panel { width: 360px; max-width: calc(100vw - 32px); max-height: 360px; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+    #diagnostic-panel.hidden { display: none; }
+    #diagnostic-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 10px; cursor: grab; user-select: none; }
+    #diagnostic-header:active { cursor: grabbing; }
+    #diagnostic-panel strong { color: var(--text); }
+    #diagnostic-close { width: 32px; height: 32px; border: none; border-radius: 10px; background: rgba(255,255,255,.05); color: var(--text); cursor: pointer; font-size: 16px; }
+    #diagnostic-body { padding: 0 14px 14px; }
+    #diagnostic-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; max-height: 218px; overflow: auto; }
+    .diag-item { border-radius: 12px; padding: 12px; background: rgba(255,255,255,.03); color: var(--text); line-height: 1.5; }
+    .diag-item.error { background: rgba(245,101,101,.08); border: 1px solid rgba(245,101,101,.16); }
+    .diag-item.ok { background: rgba(62,207,142,.08); border: 1px solid rgba(62,207,142,.16); }
+    .diag-item.pending { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
+    .diag-note { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .diag-extra { margin-top: 6px; color: var(--accent); font-size: 12px; }
+    #diagnostic-hint { margin-top: 12px; color: var(--muted); font-size: 12px; }
+    #diagnostic-run { width: 100%; margin-top: 0; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(62,207,142,.25); background: rgba(62,207,142,.12); color: var(--text); font-family: var(--fmono); font-size: 13px; cursor: pointer; }
+    #diagnostic-run:disabled { opacity: .6; cursor: not-allowed; }
+  </style>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg:       #080c10;
+
+
       --surface:  #0e1419;
       --surface2: #141c24;
       --border:   #1e2d3d;
@@ -259,6 +292,155 @@
 
 <div id="toast" class="toast"></div>
 
+<div id="diagnostic-widget">
+  <button id="diagnostic-toggle" aria-label="Open diagnostics">⚡</button>
+  <div id="diagnostic-panel" hidden>
+    <div id="diagnostic-header">
+      <strong>Network diagnostics</strong>
+      <button id="diagnostic-close" aria-label="Close diagnostics">×</button>
+    </div>
+    <div id="diagnostic-body">
+      <button id="diagnostic-run" type="button">Run tests</button>
+      <ul id="diagnostic-list"></ul>
+      <div id="diagnostic-hint">Tap the button to open diagnostics, drag the header to move it, and close when you’re done.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const explanations = [
+      { match: /CORS policy/i, text: "The browser blocked the response because the endpoint did not allow access from this origin. This is usually a cross-origin restriction, not a problem with your connection." },
+      { match: /No 'Access-Control-Allow-Origin'/i, text: "The response is missing the header needed to allow this page to read it. This is a CORS issue." },
+      { match: /Failed to fetch/i, text: "The request was blocked or the endpoint did not respond. It may be unreachable, blocked, or a browser restriction." },
+      { match: /403.*Forbidden|Forbidden/i, text: "The server rejected the request. Usually the key or permissions are invalid, or the service does not allow this call." },
+      { match: /404.*Not Found|Not Found/i, text: "The requested address was not found. Check the URL or the endpoint path." },
+      { match: /401.*Unauthorized|Unauthorized/i, text: "The request is not authorized. The key may be wrong, expired, or not allowed to access this resource." },
+      { match: /400.*Bad Request|Bad Request/i, text: "The request is malformed. Check the URL, headers, and request format." }
+    ];
+
+    const widget = document.getElementById('diagnostic-widget');
+    const panel = document.getElementById('diagnostic-panel');
+    const toggle = document.getElementById('diagnostic-toggle');
+    const closeBtn = document.getElementById('diagnostic-close');
+    const runBtn = document.getElementById('diagnostic-run');
+    const list = document.getElementById('diagnostic-list');
+    const header = document.getElementById('diagnostic-header');
+
+    function explain(message) {
+      if (!message) return '';
+      for (const entry of explanations) {
+        if (entry.match.test(message)) return entry.text;
+      }
+      return '';
+    }
+
+    function addItem(name, status, message) {
+      const li = document.createElement('li');
+      const className = status === true ? 'ok' : status === false ? 'error' : 'pending';
+      li.className = `diag-item ${className}`;
+      const title = document.createElement('div');
+      title.innerHTML = `<strong>${name}:</strong> ${message}`;
+      li.appendChild(title);
+      const noteText = explain(message);
+      if (noteText) {
+        const note = document.createElement('div');
+        note.className = 'diag-note';
+        note.textContent = noteText;
+        li.appendChild(note);
+      }
+      list.appendChild(li);
+      return li;
+    }
+
+    async function testUrl(name, url, timeout = 9000) {
+      addItem(name, 'pending', 'Testing…');
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { method: 'GET', cache: 'no-store', signal: controller.signal });
+        clearTimeout(timer);
+        const statusText = response.ok ? `OK (${response.status})` : `HTTP ${response.status}`;
+        addItem(name, response.ok, statusText);
+        console.log('[net-test] OK', name, url, response);
+      } catch (error) {
+        clearTimeout(timer);
+        addItem(name, false, error.message || String(error));
+        console.error('[net-test] ERROR', name, url, error);
+      }
+    }
+
+    async function runAll() {
+      list.innerHTML = '';
+      runBtn.disabled = true;
+      runBtn.textContent = 'Running…';
+      const apiKey = (window.firebaseConfig && window.firebaseConfig.apiKey) || (typeof firebaseConfig !== 'undefined' ? firebaseConfig.apiKey : '');
+      const tests = [
+        { name: 'Browser fetch test', url: 'https://www.google.com/' },
+        { name: 'Google Fonts', url: 'https://fonts.googleapis.com/css2?family=Syne:wght@400;600&display=swap' },
+        { name: 'Firebase IdentityToolkit', url: `https://identitytoolkit.googleapis.com/v1/projects?key=${apiKey}` },
+        { name: 'Firestore root', url: 'https://firestore.googleapis.com/' }
+      ];
+      for (const test of tests) {
+        await testUrl(test.name, test.url);
+      }
+      addItem('Summary', true, 'Diagnostics complete. See each result above.');
+      runBtn.disabled = false;
+      runBtn.textContent = 'Run tests';
+    }
+
+    toggle.addEventListener('click', () => {
+      panel.hidden = false;
+      toggle.hidden = true;
+      setTimeout(runAll, 200);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      panel.hidden = true;
+      toggle.hidden = false;
+      widget.style.left = 'auto';
+      widget.style.top = 'auto';
+      widget.style.right = '16px';
+      widget.style.bottom = '16px';
+    });
+
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let originX = 0;
+    let originY = 0;
+
+    header.addEventListener('pointerdown', event => {
+      // Ignore pointerdown when clicking interactive elements inside header
+      if (event.target && event.target.closest && event.target.closest('button')) return;
+      dragging = true;
+      startX = event.clientX;
+      startY = event.clientY;
+      const rect = widget.getBoundingClientRect();
+      originX = rect.left;
+      originY = rect.top;
+      header.setPointerCapture(event.pointerId);
+    });
+
+    document.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      event.preventDefault();
+      const x = originX + event.clientX - startX;
+      const y = originY + event.clientY - startY;
+      const maxX = window.innerWidth - widget.offsetWidth - 16;
+      const maxY = window.innerHeight - widget.offsetHeight - 16;
+      widget.style.left = `${Math.min(Math.max(16, x), maxX)}px`;
+      widget.style.top = `${Math.min(Math.max(16, y), maxY)}px`;
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+    });
+
+    document.addEventListener('pointerup', () => {
+      dragging = false;
+    });
+  })();
+</script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -274,6 +456,7 @@
   messagingSenderId: "232933912937",  
   appId: "1:232933912937:web:916d3bd002525fb251cdf8" 
 };
+  window.firebaseConfig = firebaseConfig;
 
   const app      = initializeApp(firebaseConfig);
   const auth     = getAuth(app);

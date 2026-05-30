@@ -55,16 +55,17 @@ jobs:
 
           function pingSupabase(projectRef, anonKey) {
             return new Promise(resolve => {
-              const url = \`\${projectRef}/rest/v1/\`;
+              const url = `${projectRef}/rest/v1/rpc/supawake_ping`;
               try {
                 const urlObj = new URL(url);
                 const opts = {
                   hostname: urlObj.hostname,
                   path: urlObj.pathname,
-                  method: 'GET',
+                  method: 'POST',
                   headers: {
                     'apikey': anonKey,
                     'Authorization': \`Bearer \${anonKey}\`
+                    , 'Content-Type': 'application/json'
                   }
                 };
                 const req = https.request(opts, res => {
@@ -76,6 +77,7 @@ jobs:
                   resolve(false);
                 });
                 req.setTimeout(10000, () => { req.destroy(); resolve(false); });
+                req.write(JSON.stringify({}));
                 req.end();
               } catch(e) {
                 console.error(\`  ✗ Invalid URL \${projectRef}: \${e.message}\`);
@@ -110,8 +112,10 @@ jobs:
               const ref     = fields.ref?.stringValue;
               const anonKey = fields.anonKey?.stringValue;
               const label   = fields.label?.stringValue || ref;
+              const setupComplete = fields.setupComplete?.booleanValue === true;
 
               if (!ref || !anonKey) { console.log(\`Skipping \${label} — missing fields.\`); continue; }
+              if (!setupComplete) { console.log(`Skipping ${label} — setup not complete.`); continue; }
 
               console.log(\`Pinging: \${label}\`);
               const ok = await pingSupabase(ref, anonKey);

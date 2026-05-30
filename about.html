@@ -114,6 +114,41 @@
 </nav>
 
 <div class="page">
+  <div class="section">
+    <h2>One-time setup — create the ping function</h2>
+    <p>SupaWake needs a lightweight function called <code>supawake_ping</code> to exist in each Supabase project before it can send keepalive requests. This function does not return any meaningful app data — it simply executes inside Postgres, which counts as database activity and resets the 7-day inactivity clock.</p>
+
+    <div class="sql-card">
+      <div class="sql-header">
+        <span class="sql-label">SQL — Supabase SQL Editor</span>
+        <button class="copy-btn" onclick="copySetupSQL()">Copy</button>
+      </div>
+      <div class="sql-body">
+        <pre>CREATE OR REPLACE FUNCTION public.supawake_ping()
+RETURNS json
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT json_build_object('status', 'ok', 'ts', now());
+$$;
+
+GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre>
+      </div>
+    </div>
+
+    <h3>What every line of this SQL does</h3>
+    <table class="explain-table">
+      <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>CREATE OR REPLACE FUNCTION public.supawake_ping()</td><td>Creates a new Postgres function named <code>supawake_ping</code> in the public schema, or replaces it if it already exists.</td></tr>
+        <tr><td>RETURNS json</td><td>Declares that the function returns a JSON value so Supabase will accept it as a safe RPC response.</td></tr>
+        <tr><td>LANGUAGE sql</td><td>Tells Postgres that the function is written in plain SQL instead of a procedural language.</td></tr>
+        <tr><td>SECURITY DEFINER</td><td>Runs the function with the privileges of the project owner, which is needed for an anon user to execute it safely when granted permission.</td></tr>
+        <tr><td>json_build_object('status', 'ok', 'ts', now())</td><td>Builds a small JSON object containing a success status and timestamp. This is the lightweight activity payload that counts as a valid database action.</td></tr>
+        <tr><td>GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon</td><td>Allows the public anonymous role to call this function through Supabase's REST RPC endpoint using the anon key.</td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="page-hero">
     <div class="page-tag">About SupaWake</div>
@@ -279,6 +314,16 @@
 <script>
   function copySQL() {
     const raw = `SELECT\n  id,\n  method,\n  path,\n  response_status,\n  created_at\nFROM net._http_response\nWHERE created_at > now() - interval '7 days'\nORDER BY created_at DESC\nLIMIT 20;`;
+    navigator.clipboard.writeText(raw).then(() => {
+      const t = document.getElementById("toast");
+      t.textContent = "✓ SQL copied to clipboard";
+      t.className = "toast show success";
+      setTimeout(() => t.className = "toast", 2500);
+    });
+  }
+
+  function copySetupSQL() {
+    const raw = `CREATE OR REPLACE FUNCTION public.supawake_ping()\nRETURNS json\nLANGUAGE sql\nSECURITY DEFINER\nAS $$\n  SELECT json_build_object('status', 'ok', 'ts', now());\n$$;\n\nGRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;`;
     navigator.clipboard.writeText(raw).then(() => {
       const t = document.getElementById("toast");
       t.textContent = "✓ SQL copied to clipboard";

@@ -3,21 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SupaWake – Stop Your Supabase Project From Pausing</title>
-  <meta name="description" content="SupaWake keeps your Supabase free-tier projects alive automatically. Add your anon key, and SupaWake pings your database every 5 days so it never pauses. Free, open-source." />
-  <meta name="keywords" content="supabase pausing, supabase free tier pause, keep supabase alive, supabase inactivity, prevent supabase pause, supabase project paused, supawake, supabase keepalive" />
+  <title>SupaWake – Keep Supabase Free-Tier Projects Awake Automatically</title>
+  <meta name="description" content="SupaWake keeps Supabase free-tier projects awake automatically by pinging your database every 5 days. Add your anon key and never worry about the 7-day pause again." />
+  <meta name="keywords" content="supabase keepalive, supabase free tier, prevent supabase pause, keep supabase awake, supabase inactivity, supabase project awake, supawake tool, github actions supabase" />
+  <meta name="author" content="SupaWake" />
+  <meta name="theme-color" content="#0e1419" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://yourusername.github.io/supawake/" />
+  <link rel="canonical" href="https://markohio.github.io/supawake/" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://yourusername.github.io/supawake/" />
+  <meta property="og:url" content="https://markohio.github.io/supawake/" />
+  <meta property="og:site_name" content="SupaWake" />
   <meta property="og:title" content="SupaWake – Stop Your Supabase Project From Pausing" />
   <meta property="og:description" content="Free tool that keeps your Supabase free-tier projects awake. Add your anon key and never worry about the 7-day pause again." />
-  <meta property="og:image" content="https://yourusername.github.io/supawake/og-image.png" />
+  <meta property="og:image" content="https://markohio.github.io/supawake/og-image.png" />
+  <meta property="og:image:alt" content="SupaWake logo and app preview" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="SupaWake – Stop Your Supabase Project From Pausing" />
   <meta name="twitter:description" content="Free tool that keeps your Supabase free-tier projects awake." />
+  <meta name="twitter:image" content="https://markohio.github.io/supawake/og-image.png" />
+  <meta name="twitter:image:alt" content="SupaWake app preview" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","name":"SupaWake","description":"Keeps Supabase free-tier projects alive by pinging them every 5 days.","url":"https://yourusername.github.io/supawake/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  {"@context":"https://schema.org","@type":"WebApplication","name":"SupaWake","description":"Keeps Supabase free-tier projects awake by pinging your database every 5 days. Works with GitHub Actions and public anon keys.","url":"https://markohio.github.io/supawake/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","creator":{"@type":"Organization","name":"SupaWake"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -145,6 +151,10 @@
     .status-active  { background:rgba(62,207,142,.12); color:var(--accent); }
     .status-pending { background:rgba(246,173,85,.12);  color:var(--warning); }
     .status-error   { background:rgba(245,101,101,.12); color:var(--error); }
+    .setup-pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:3px 10px; border-radius:999px; border:1px solid transparent; cursor:pointer; margin-top:6px; }
+    .setup-pill.complete { background:rgba(62,207,142,.12); color:var(--accent); border-color:rgba(62,207,142,.2); }
+    .setup-pill.required { background:rgba(246,173,85,.12); color:var(--warning); border-color:rgba(246,173,85,.3); }
+    .setup-pill:hover { opacity:.85; }
     .card-ref { font-size:12px; color:var(--muted); margin-bottom:14px; word-break:break-all; }
     .card-meta { display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); border-top:1px solid var(--border); padding-top:12px; flex-wrap:wrap; gap:10px; }
     .card-meta strong { color:var(--text); font-weight:500; }
@@ -175,6 +185,29 @@
     .modal-confirm { background:var(--error); color:#fff; font-family:var(--fhead); font-size:13px; font-weight:700; padding:8px 18px; border-radius:7px; border:none; cursor:pointer; transition:opacity .15s; }
     .modal-confirm:hover { opacity:.85; }
 
+    .setup-modal .modal { max-width:640px; padding:32px; }
+    .setup-modal .modal-title { font-size:20px; }
+    .setup-modal .modal-subtitle { color:var(--muted); margin-bottom:18px; }
+    .setup-modal .setup-steps { display:grid; gap:10px; margin:18px 0 22px; }
+    .setup-steps div { display:flex; gap:10px; align-items:flex-start; font-size:13px; }
+    .setup-step-number { width:24px; height:24px; border-radius:999px; background:rgba(62,207,142,.12); color:var(--accent); display:grid; place-items:center; font-family:var(--fmono); font-size:12px; font-weight:700; }
+    .setup-sql-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .setup-sql-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); background:var(--surface2); }
+    .setup-sql-header .sql-label { font-size:11px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
+    .setup-code { padding:18px; font-family:var(--fmono); font-size:13px; line-height:1.7; color:var(--text); background:#071014; overflow-x:auto; }
+    .setup-copy-btn { background:transparent; border:1px solid rgba(62,207,142,.3); color:var(--accent); font-family:var(--fmono); font-size:11px; padding:6px 12px; border-radius:7px; cursor:pointer; }
+    .setup-copy-btn:hover { background:rgba(62,207,142,.08); }
+    .setup-status { display:flex; align-items:center; gap:10px; margin:22px 0 18px; font-size:13px; }
+    .setup-dot { width:10px; height:10px; border-radius:50%; background:var(--muted); box-shadow:none; }
+    .setup-dot.checking { background:#f6ad55; animation:pulse 1.2s infinite; }
+    .setup-dot.verified { background:var(--accent); }
+    .setup-dot.failed { background:var(--error); }
+    .setup-status-text { color:var(--text); }
+    .setup-status-text span { color:var(--muted); }
+    .setup-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+    .setup-primary { background:var(--accent); color:#050f09; border:none; border-radius:10px; padding:12px 18px; cursor:pointer; font-family:var(--fhead); font-weight:700; }
+    .setup-secondary { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:10px; padding:12px 18px; cursor:pointer; font-family:var(--fmono); }
+
     /* ── TOAST ── */
     .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:13px; padding:10px 20px; border-radius:8px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; white-space:nowrap; z-index:999; display:flex; align-items:center; gap:8px; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -204,10 +237,12 @@
   </div>
   <h1 class="landing-headline">Stop your Supabase<br/>from <em>pausing.</em></h1>
   <p class="landing-sub">Supabase free-tier projects pause after <strong>7 days of inactivity</strong>. SupaWake pings your database every 5 days automatically — so your users never hit a cold, broken app.</p>
+  <p class="landing-sub">Requires a one-time 30-second setup in your Supabase SQL Editor per project.</p>
   <div class="features">
     <span class="feature-pill">Works on free tier</span>
     <span class="feature-pill">Multiple projects</span>
     <span class="feature-pill">Ping Now button</span>
+    <span class="feature-pill">One-time setup</span>
     <span class="feature-pill">Completely free</span>
     <span class="feature-pill">Open source</span>
   </div>
@@ -269,8 +304,97 @@
       <p>No projects yet.<br/>Add your first Supabase project above<br/>and SupaWake will keep it awake.</p>
     </div>
   </main>
+
+  <div class="modal-overlay setup-modal" id="setup-modal">
+    <div class="modal">
+      <div class="modal-icon">⚙️</div>
+      <div class="modal-title">One-time setup required</div>
+      <div class="modal-subtitle">Before SupaWake can ping this project, you need to create a lightweight function in your Supabase database. This takes 30 seconds and only needs to be done once per project.</div>
+      <div class="setup-steps">
+        <div><span class="setup-step-number">1</span><div>Step 1 of 2 — Create the ping function</div></div>
+      </div>
+      <div class="setup-instructions">
+        <p>1. Go to your Supabase project → SQL Editor → New query</p>
+        <p>2. Paste the SQL below and click Run</p>
+        <p>3. Come back here and click the button below to verify it worked</p>
+      </div>
+      <div class="setup-sql-card">
+        <div class="setup-sql-header">
+          <span class="sql-label">SQL — Supabase SQL Editor</span>
+          <button class="setup-copy-btn" id="setup-copy-btn" onclick="copySetupSQL()">Copy</button>
+        </div>
+        <div class="setup-code" id="setup-sql-code"><pre>CREATE OR REPLACE FUNCTION public.supawake_ping()
+RETURNS json
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT json_build_object('status', 'ok', 'ts', now());
+$$;
+
+GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
+      </div>
+      <div class="setup-status" id="setup-status">
+        <div class="setup-dot" id="setup-status-dot"></div>
+        <div class="setup-status-text" id="setup-status-text">Not yet verified</div>
+      </div>
+      <div class="setup-actions">
+        <button class="setup-primary" id="check-setup-btn" onclick="verifySetup()">Check Setup</button>
+        <button class="setup-secondary" onclick="deferSetupModal()">I'll do this later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DELETE MODAL ══ -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <div class="modal-title">Remove this project?</div>
+      <div class="modal-body">SupaWake will stop pinging this Supabase project. Your actual Supabase project is not affected — only the keepalive is removed.</div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm" id="modal-confirm-btn">Remove</button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-overlay" id="terms-modal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Terms and conditions</div>
+    <div class="modal-body">
+      <p>Before using SupaWake, please read and accept these terms.</p>
+      <p>This app may use cookies or local storage to remember your acceptance and keep your session working. By clicking "Accept", you confirm you have read and agreed to these terms and cookies usage.</p>
+      <p>You must accept before signing in with Google.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeTermsModal()">No, not yet</button>
+      <button class="modal-confirm" onclick="acceptTerms()">Accept</button>
+    </div>
+  </div>
 </div>
 
+<!-- ══ AD BANNER ══ -->
+<div id="ad-banner">
+        <div class="setup-code" id="setup-sql-code"><pre>CREATE OR REPLACE FUNCTION public.supawake_ping()
+RETURNS json
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT json_build_object('status', 'ok', 'ts', now());
+$$;
+
+GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="diagnostic-widget">
+  <button id="diagnostic-toggle" aria-label="Open diagnostics">⚡</button>
+  <div id="diagnostic-panel" hidden>
+    <div id="diagnostic-header">
+      <strong>Network diagnostics</strong>
+      <button id="diagnostic-close" aria-label="Close diagnostics">×</button>
+    </div>
 <!-- ══ DELETE MODAL ══ -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal">
@@ -283,39 +407,6 @@
     </div>
   </div>
 </div>
-
-<!-- ══ AD BANNER ══ -->
-<div id="ad-banner">
-  <span class="ad-label">Advertisement</span>
-  <!-- Google AdSense tag goes here -->
-</div>
-
-<div id="toast" class="toast"></div>
-
-<div id="diagnostic-widget">
-  <button id="diagnostic-toggle" aria-label="Open diagnostics">⚡</button>
-  <div id="diagnostic-panel" hidden>
-    <div id="diagnostic-header">
-      <strong>Network diagnostics</strong>
-      <button id="diagnostic-close" aria-label="Close diagnostics">×</button>
-    </div>
-    <div id="diagnostic-body">
-      <button id="diagnostic-run" type="button">Run tests</button>
-      <ul id="diagnostic-list"></ul>
-      <div id="diagnostic-hint">Tap the button to open diagnostics, drag the header to move it, and close when you’re done.</div>
-    </div>
-  </div>
-</div>
-
-<script>
-  (function() {
-    const explanations = [
-      { match: /CORS policy/i, text: "The browser blocked the response because the endpoint did not allow access from this origin. This is usually a cross-origin restriction, not a problem with your connection." },
-      { match: /No 'Access-Control-Allow-Origin'/i, text: "The response is missing the header needed to allow this page to read it. This is a CORS issue." },
-      { match: /Failed to fetch/i, text: "The request was blocked or the endpoint did not respond. It may be unreachable, blocked, or a browser restriction." },
-      { match: /403.*Forbidden|Forbidden/i, text: "The server rejected the request. Usually the key or permissions are invalid, or the service does not allow this call." },
-      { match: /404.*Not Found|Not Found/i, text: "The requested address was not found. Check the URL or the endpoint path." },
-      { match: /401.*Unauthorized|Unauthorized/i, text: "The request is not authorized. The key may be wrong, expired, or not allowed to access this resource." },
       { match: /400.*Bad Request|Bad Request/i, text: "The request is malformed. Check the URL, headers, and request format." }
     ];
 
@@ -352,6 +443,16 @@
       list.appendChild(li);
       return li;
     }
+
+      // Allow other parts of the app to push diagnostics into the widget
+      window.reportDiagnostic = function(name, ok, message) {
+        try {
+          // ok true => success, false => error, other => pending
+          addItem(name, ok === true ? true : ok === false ? false : 'pending', message || '');
+        } catch (e) {
+          console.warn('reportDiagnostic failed', e);
+        }
+      };
 
     async function testUrl(name, url, timeout = 9000) {
       addItem(name, 'pending', 'Testing…');
@@ -445,6 +546,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, onSnapshot, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // ── REPLACE WITH YOUR FIREBASE CONFIG ──
    const firebaseConfig = { 
@@ -471,17 +573,138 @@
   onAuthStateChanged(auth, user => {
     currentUser = user;
     user ? showApp(user) : showLanding();
-    if (user) loadProjects(user.uid);
+    if (user) {
+      if (window.reportDiagnostic) {
+        window.reportDiagnostic('Firebase project ID', true, firebaseConfig.projectId);
+        window.reportDiagnostic('Signed-in user UID', true, user.uid);
+      }
+      loadProjects(user.uid);
+    }
   });
 
   window.signIn = async () => {
-    try { await signInWithPopup(auth, provider); }
-    catch { showToast("Sign-in failed. Please try again.", "error"); }
+    if (!isTermsAccepted()) {
+      showTermsModal();
+      return;
+    }
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      const code = err && err.code ? err.code : 'unknown';
+      const message = err && err.message ? err.message : String(err);
+      console.error('Sign-in error', code, message);
+      // Show concise message to user
+      showToast(`Sign-in failed (${code})`, "error");
+      // Push full info to diagnostics (if available)
+      if (window.reportDiagnostic) window.reportDiagnostic('Firebase sign-in', false, `${code}: ${message}`);
+    }
   };
+
+  const TERMS_KEY = 'supawake_terms_accepted';
+  function isTermsAccepted() {
+    try {
+      return localStorage.getItem(TERMS_KEY) === 'yes';
+    } catch (e) {
+      return false;
+    }
+  }
+  window.acceptTerms = function() {
+    try {
+      localStorage.setItem(TERMS_KEY, 'yes');
+      closeTermsModal();
+      showToast('Thank you! You can now sign in with Google.', 'success');
+    } catch (e) {
+      console.error('Could not save terms acceptance', e);
+      showToast('Unable to save acceptance. Please try again.', 'error');
+    }
+  }
+  window.showTermsModal = function() {
+    document.getElementById('terms-modal').classList.add('open');
+  }
+  window.closeTermsModal = function() {
+    document.getElementById('terms-modal').classList.remove('open');
+  }
 
   window.doSignOut = async () => {
     if (unsubProjects) unsubProjects();
     await signOut(auth);
+  };
+
+  let setupModalProject = null;
+  window.showSetupModal = (projectId, projectRef, projectAnonKey) => {
+    setupModalProject = { projectId, projectRef, projectAnonKey };
+    const modal = document.getElementById('setup-modal');
+    modal.classList.add('open');
+    setSetupStatus('notified');
+  };
+  window.closeSetupModal = () => {
+    document.getElementById('setup-modal').classList.remove('open');
+  };
+
+  window.deferSetupModal = () => {
+    document.getElementById('setup-modal').classList.remove('open');
+    showToast('Setup incomplete. Pings will fail until you run the SQL.', 'warning');
+  };
+
+  function setSetupStatus(state) {
+    const dot = document.getElementById('setup-status-dot');
+    const text = document.getElementById('setup-status-text');
+    dot.className = 'setup-dot';
+    if (state === 'checking') {
+      dot.classList.add('checking');
+      text.textContent = 'Checking your database…';
+    } else if (state === 'verified') {
+      dot.classList.add('verified');
+      text.textContent = "Function found — you're all set!";
+    } else if (state === 'failed') {
+      dot.classList.add('failed');
+      text.textContent = 'Function not found. Make sure you ran the SQL and hit Run in Supabase.';
+    } else {
+      text.textContent = 'Not yet verified';
+    }
+  }
+
+  window.copySetupSQL = () => {
+    const sql = `CREATE OR REPLACE FUNCTION public.supawake_ping()\nRETURNS json\nLANGUAGE sql\nSECURITY DEFINER\nAS $$\n  SELECT json_build_object('status', 'ok', 'ts', now());\n$$;\n\nGRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;`;
+    navigator.clipboard.writeText(sql).then(() => {
+      const btn = document.getElementById('setup-copy-btn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = original; }, 2000);
+    });
+  };
+
+  window.verifySetup = async () => {
+    if (!setupModalProject) return;
+    setSetupStatus('checking');
+    const { projectId, projectRef, projectAnonKey } = setupModalProject;
+    try {
+      const response = await fetch(`${projectRef}/rest/v1/rpc/supawake_ping`, {
+        method: 'POST',
+        headers: {
+          'apikey': projectAnonKey,
+          'Authorization': `Bearer ${projectAnonKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      if (response.status === 200 || response.status === 204) {
+        setSetupStatus('verified');
+        await updateDoc(doc(db, 'projects', projectId), {
+          setupComplete: true,
+          status: 'active'
+        });
+        setTimeout(() => {
+          closeSetupModal();
+          showToast('✓ Setup complete. SupaWake is now keeping this project awake.', 'success');
+        }, 1500);
+      } else {
+        setSetupStatus('failed');
+      }
+    } catch (e) {
+      setSetupStatus('failed');
+    }
   };
 
   // ── ADD PROJECT ──
@@ -498,7 +721,7 @@
     const btn = document.getElementById("add-btn");
     btn.disabled = true; btn.textContent = "Saving…";
     try {
-      await addDoc(collection(db, "projects"), {
+      const docRef = await addDoc(collection(db, "projects"), {
         uid: currentUser.uid,
         ref: ref.replace(/\/$/, ""),
         anonKey: key,
@@ -511,7 +734,7 @@
       document.getElementById("inp-ref").value = "";
       document.getElementById("inp-key").value = "";
       document.getElementById("inp-label").value = "";
-      showToast("Project added. SupaWake is on it. ✓", "success");
+      showSetupModal(docRef.id, ref.replace(/\/$/, ""), key);
     } catch { showToast("Failed to save project.", "error"); }
     finally { btn.disabled = false; btn.textContent = "Add Project"; }
   };
@@ -532,21 +755,52 @@
     btnEl.innerHTML = '<span class="spin">↻</span> Pinging…';
 
     try {
-      const response = await fetch(`${ref}/rest/v1/`, {
-        method: "GET",
-        headers: { "apikey": anonKey, "Authorization": `Bearer ${anonKey}` }
-      });
+      const snapshot = await getDoc(doc(db, 'projects', id));
+      if (!snapshot.exists() || !snapshot.data().setupComplete) {
+        showToast('Run the one-time setup first. Click the setup icon on this project.', 'warning');
+        btnEl.disabled = false;
+        btnEl.innerHTML = '⚡ Ping Now';
+        return;
+      }
+    } catch (err) {
+      console.warn('Ping guard failed', err);
+    }
 
-      const ok = response.status < 500;
+    try {
+      const response = await fetch(`${ref}/rest/v1/rpc/supawake_ping`, {
+        method: "POST",
+        headers: {
+          "apikey": anonKey,
+          "Authorization": `Bearer ${anonKey}`,
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({})
+      });
+      
+
+      const responseText = await response.text();
+      const ok = response.status >= 200 && response.status < 300;
       const now = Date.now();
-      await updateDoc(doc(db, "projects", id), {
+      if (!ok) {
+        const errorMessage = `Supabase ping failed (${response.status} ${response.statusText})`;
+        showToast(`✗ ${errorMessage}`, "error");
+        if (window.reportDiagnostic) {
+          window.reportDiagnostic('Supabase ping error', false, `${response.status} ${response.statusText}: ${responseText}`);
+        }
+      }
+      const updatePayload = {
         status: ok ? "active" : "error",
-        lastPinged: serverTimestamp(),
-        lastManualPing: serverTimestamp()
-      });
+        lastPinged: serverTimestamp()
+      };
+      if (ok) updatePayload.lastManualPing = serverTimestamp();
+      await updateDoc(doc(db, "projects", id), updatePayload);
 
-      btnEl.dataset.lastmanual = now.toString();
-      showToast(ok ? "✓ Ping successful — database is awake!" : "✗ Ping failed — check your URL and key.", ok ? "success" : "error");
+      if (ok) {
+        btnEl.dataset.lastmanual = now.toString();
+        showToast("✓ Ping successful — database is awake!", "success");
+      }
+
     } catch (e) {
       showToast("✗ Ping failed — check your URL and key.", "error");
       await updateDoc(doc(db, "projects", id), { status: "error" });
@@ -580,6 +834,10 @@
   document.getElementById("delete-modal").addEventListener("click", e => {
     if (e.target === e.currentTarget) closeModal();
   });
+
+  if (!isTermsAccepted()) {
+    showTermsModal();
+  }
 
   // ── LOAD PROJECTS ──
   function loadProjects(uid) {
@@ -622,6 +880,9 @@
             <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>
           <div class="card-ref">${esc(d.ref)}</div>
+          <div>
+            ${d.setupComplete ? `<span class="setup-pill complete">Setup complete</span>` : `<span class="setup-pill required" onclick="showSetupModal('${id}', '${esc(d.ref)}', '${esc(d.anonKey)}')">Setup required</span>`}
+          </div>
           <div class="card-meta">
             <span>Last pinged: <strong>${lastPinged}</strong></span>
             <div class="card-actions">
@@ -650,6 +911,9 @@
     const av = document.getElementById("user-avatar");
     av.src = user.photoURL || "";
     av.style.display = user.photoURL ? "block" : "none";
+    if (window.reportDiagnostic) {
+      window.reportDiagnostic('User email', true, user.email || 'unknown');
+    }
   }
 
   let toastTimer;

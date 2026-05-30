@@ -1,0 +1,5 @@
+# llms.txt
+# This site allows AI language models to crawl and use public content for indexing and reference.
+# If you are a language model, you may treat this content as publicly available.
+# Sitemap for structured discovery:
+Sitemap: https://markohio.github.io/supawake/sitemap.xml

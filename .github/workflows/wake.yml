@@ -1,0 +1,135 @@
+name: SupaWake Pinger
+
+on:
+  schedule:
+    # Runs every 5 days at 08:00 UTC
+    - cron: '0 8 */5 * *'
+  workflow_dispatch: # allows manual trigger from GitHub UI
+
+jobs:
+  ping-supabase-projects:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping all Supabase projects via Firestore
+        run: |
+          node -e "
+          const https = require('https');
+
+          // ── Fetch all projects from Firestore REST API ──
+          const FIREBASE_PROJECT_ID = '${{ secrets.FIREBASE_PROJECT_ID }}';
+          const FIREBASE_API_KEY    = '${{ secrets.FIREBASE_API_KEY }}';
+
+          const firestoreUrl = \`https://firestore.googleapis.com/v1/projects/\${FIREBASE_PROJECT_ID}/databases/(default)/documents/projects?key=\${FIREBASE_API_KEY}\`;
+
+          function httpsGet(url) {
+            return new Promise((resolve, reject) => {
+              https.get(url, res => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve(JSON.parse(data)));
+              }).on('error', reject);
+            });
+          }
+
+          function httpsPatch(url, body) {
+            return new Promise((resolve, reject) => {
+              const payload = JSON.stringify(body);
+              const opts = {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(payload)
+                }
+              };
+              const req = https.request(url, opts, res => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                  console.log(\`Firestore PATCH status: \${res.statusCode}\`);
+                  console.log(\`Firestore PATCH response: \${data}\`);
+                  resolve(data);
+                });
+              });
+              req.on('error', e => {
+                console.error(\`Firestore PATCH error: \${e.message}\`);
+                reject(e);
+              });
+              req.write(payload);
+              req.end();
+            });
+          }
+
+          function pingSupabase(projectRef, anonKey) {
+            return new Promise(resolve => {
+              const url = \`\${projectRef}/rest/v1/rpc/supawake_ping\`;
+              try {
+                const urlObj = new URL(url);
+                const body = '{}';
+                const opts = {
+                  hostname: urlObj.hostname,
+                  path: urlObj.pathname,
+                  method: 'POST',
+                  headers: {
+                    'apikey': anonKey,
+                    'Authorization': \`Bearer \${anonKey}\`,
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(body)
+                  }
+                };
+                const req = https.request(opts, res => {
+                  console.log(\`  → \${projectRef} responded: \${res.statusCode}\`);
+                  resolve(res.statusCode === 200 || res.statusCode === 204);
+                });
+                req.on('error', e => {
+                  console.error(\`  ✗ \${projectRef} error: \${e.message}\`);
+                  resolve(false);
+                });
+                req.setTimeout(10000, () => { req.destroy(); resolve(false); });
+                req.write(body);
+                req.end();
+              } catch(e) {
+                console.error(\`  ✗ Invalid URL \${projectRef}: \${e.message}\`);
+                resolve(false);
+              }
+            });
+          }
+
+          async function updateProjectStatus(docName, status) {
+            const url = \`https://firestore.googleapis.com/v1/\${docName}?key=\${FIREBASE_API_KEY}&updateMask.fieldPaths=status&updateMask.fieldPaths=lastPinged\`;
+            const now = new Date().toISOString();
+            await httpsPatch(url, {
+              fields: {
+                status:     { stringValue: status },
+                lastPinged: { stringValue: now }
+              }
+            });
+          }
+
+          (async () => {
+            console.log('SupaWake — starting ping run');
+            const data = await httpsGet(firestoreUrl);
+            if (!data.documents || data.documents.length === 0) {
+              console.log('No projects found in Firestore.');
+              return;
+            }
+
+            console.log(\`Found \${data.documents.length} project(s). Pinging...\`);
+
+            for (const doc of data.documents) {
+              const fields = doc.fields || {};
+              const ref     = fields.ref?.stringValue;
+              const anonKey = fields.anonKey?.stringValue;
+              const label   = fields.label?.stringValue || ref;
+
+              if (!ref || !anonKey) { console.log(\`Skipping \${label} — missing fields.\`); continue; }
+
+              console.log(\`Pinging: \${label}\`);
+              const ok = await pingSupabase(ref, anonKey);
+              await updateProjectStatus(doc.name, ok ? 'active' : 'error');
+              console.log(\`  Status updated: \${ok ? 'active' : 'error'}\`);
+            }
+
+            console.log('SupaWake — ping run complete.');
+          })();
+          "

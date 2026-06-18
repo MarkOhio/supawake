@@ -78,7 +78,7 @@
       --muted:    #5a7a96;
       --error:    #f56565;
       --warning:  #f6ad55;
-      --fhead:    'Syne', sans-serif;
+      --fhead:    sans-serif;
       --fmono:    'DM Mono', monospace;
       --r:        10px;
     }
@@ -87,7 +87,7 @@
     body::after { content:''; position:fixed; top:-200px; left:50%; transform:translateX(-50%); width:700px; height:500px; background:radial-gradient(ellipse,rgba(62,207,142,.07) 0%,transparent 70%); pointer-events:none; z-index:0; }
 
     /* ── LANDING ── */
-    #landing { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px 120px; text-align:center; animation:fadeIn .6s ease; }
+    #landing { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 20px ; text-align:center; animation:fadeIn .6s ease; }
     .logo-mark { display:inline-flex; align-items:center; gap:10px; margin-bottom:32px; }
     .logo-icon { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:22px; }
     .logo-text { font-family:var(--fhead); font-size:28px; font-weight:800; letter-spacing:-.5px; }
@@ -230,6 +230,44 @@
     @keyframes spin    { to{transform:rotate(360deg)} }
     .spin { display:inline-block; animation:spin .7s linear infinite; }
   </style>
+
+  <style>
+    .footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 24px 20px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-copy { letter-spacing: 0.3px; }
+
+.footer-credit { font-size: 11px; }
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.footer a:hover { opacity: 0.75; }
+
+@media (min-width: 500px) {
+  .footer {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px 24px;
+  }
+}
+  </style>
 </head>
 <body>
 
@@ -266,8 +304,12 @@
     <div class="faq-item"><h3>How does SupaWake prevent Supabase from pausing?</h3><p>SupaWake sends an authenticated request directly to your Supabase REST API every 5 days. This counts as real database activity and resets the 7-day inactivity clock. It runs automatically via GitHub Actions — set it once and forget it.</p></div>
     <div class="faq-item"><h3>Is it safe to add my Supabase anon key?</h3><p>Yes. The anon key is designed to be public — it is embedded in every Supabase frontend app by default. Security is enforced through Row Level Security policies, not by hiding the anon key. Never enter your service_role key into any third-party tool.</p></div>
     <div class="faq-item"><h3>Can I keep multiple Supabase projects awake?</h3><p>Yes. SupaWake supports unlimited projects per account. Add as many as you need — each one is pinged independently on its own schedule.</p></div>
-  <button><a href="sd/index.html">thisss</a></button>
+  
   </div>
+  <footer class="footer">
+  <span class="footer-copy">© <span id="copy-year"></span> SupaWake. All rights reserved.</span>
+  <span class="footer-credit">Created by <a href="https://markohio.github.io" target="_blank" rel="noopener">Mark Ohio</a></span>
+</footer>
 </section>
 
 <!-- ══ APP ══ -->
@@ -314,6 +356,10 @@
       <p>No projects yet.<br/>Add your first Supabase project above<br/>and SupaWake will keep it awake.</p>
     </div>
   </main>
+  <footer class="footer">
+  <span class="footer-copy">© <span id="copy-year"></span> SupaWake. All rights reserved.</span>
+  <span class="footer-credit">Created by <a href="https://markohio.github.io" target="_blank" rel="noopener">Mark Ohio</a></span>
+</footer>
 
   <div class="modal-overlay setup-modal" id="setup-modal">
     <div class="modal">
@@ -823,11 +869,13 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
         const d  = docSnap.data();
         const id = docSnap.id;
 
-        const lastPinged = d.lastPinged
-  ? new Date(d.lastPinged).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
-  : "Never";
+           const lastPinged = d.lastPinged
+          ? new Date(typeof d.lastPinged.toDate === 'function' ? d.lastPinged.toDate() : d.lastPinged).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+          : "Never";
 
-        const lastManualTs = d.lastManualPing ? d.lastManualPing.toDate().getTime() : 0;
+        const lastManualTs = d.lastManualPing
+          ? (typeof d.lastManualPing.toDate === 'function' ? d.lastManualPing.toDate().getTime() : new Date(d.lastManualPing).getTime())
+          : 0;
 
         const statusClass = d.status === "active" ? "status-active" : d.status === "error" ? "status-error" : "status-pending";
         const statusLabel = d.status === "active" ? "Awake" : d.status === "error" ? "Error" : "Pending";
@@ -887,6 +935,12 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
   function esc(str) {
     return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+</script>
+
+<script>
+  document.querySelectorAll("#copy-year").forEach(el => {
+    el.textContent = new Date().getFullYear();
+  });
 </script>
 </body>
 </html>

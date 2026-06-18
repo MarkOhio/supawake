@@ -824,8 +824,8 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
         const id = docSnap.id;
 
         const lastPinged = d.lastPinged
-          ? new Date(d.lastPinged.toDate()).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
-          : "Never";
+  ? new Date(d.lastPinged).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+  : "Never";
 
         const lastManualTs = d.lastManualPing ? d.lastManualPing.toDate().getTime() : 0;
 

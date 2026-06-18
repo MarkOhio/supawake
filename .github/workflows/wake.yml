@@ -45,9 +45,16 @@ jobs:
               const req = https.request(url, opts, res => {
                 let data = '';
                 res.on('data', chunk => data += chunk);
-                res.on('end', () => resolve(JSON.parse(data)));
+                res.on('end', () => {
+                  console.log(\`Firestore PATCH status: \${res.statusCode}\`);
+                  console.log(\`Firestore PATCH response: \${data}\`);
+                  resolve(data);
+                });
               });
-              req.on('error', reject);
+              req.on('error', e => {
+                console.error(\`Firestore PATCH error: \${e.message}\`);
+                reject(e);
+              });
               req.write(payload);
               req.end();
             });

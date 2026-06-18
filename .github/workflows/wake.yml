@@ -96,14 +96,15 @@ jobs:
           }
 
           async function updateProjectStatus(docName, status) {
-           const url = `https://firestore.googleapis.com/v1/${docName}?key=${FIREBASE_API_KEY}&updateMask.fieldPaths=status&updateMask.fieldPaths=lastPinged`;
-           await httpsPatch(url, {
-           fields: {
-           status:     { stringValue: status },
-           lastPinged: { stringValue: new Date().toISOString() }
-            }
-           });
-           }
+            const url = \`https://firestore.googleapis.com/v1/\${docName}?key=\${FIREBASE_API_KEY}&updateMask.fieldPaths=status&updateMask.fieldPaths=lastPinged\`;
+            const now = new Date().toISOString();
+            await httpsPatch(url, {
+              fields: {
+                status:     { stringValue: status },
+                lastPinged: { stringValue: now }
+              }
+            });
+          }
 
           (async () => {
             console.log('SupaWake — starting ping run');

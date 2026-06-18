@@ -93,7 +93,7 @@ jobs:
            await httpsPatch(url, {
            fields: {
            status:     { stringValue: status },
-           lastPinged: { timestampValue: new Date().toISOString() }
+           lastPinged: { stringValue: new Date().toISOString() }
             }
            });
            }

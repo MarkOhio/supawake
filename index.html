@@ -268,6 +268,80 @@
   }
 }
   </style>
+
+  <style>
+    /* ── DANGER ZONE ── */
+.danger-zone {
+  margin-top: 48px;
+  border: 1px solid rgba(245,101,101,0.2);
+  border-radius: var(--r);
+  padding: 24px;
+}
+.danger-zone-title {
+  font-family: var(--fhead);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--error);
+  margin-bottom: 8px;
+}
+.danger-zone-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.delete-account-btn {
+  background: transparent;
+  border: 1px solid var(--error);
+  color: var(--error);
+  font-family: var(--fhead);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.delete-account-btn:hover {
+  background: var(--error);
+  color: #fff;
+}
+
+/* ── DELETE ACCOUNT MODAL ── */
+#delete-account-modal .modal-confirm {
+  background: var(--error);
+}
+#delete-account-modal .modal-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.confirm-phrase-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: var(--fmono);
+  font-size: 13px;
+  outline: none;
+  margin-top: 12px;
+  transition: border-color .15s;
+}
+.confirm-phrase-input:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(245,101,101,0.1);
+}
+.confirm-phrase-input::placeholder { color: var(--muted); opacity: .6; }
+.phrase-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.phrase-hint strong { color: var(--text); font-weight: 500; }
+  </style>
 </head>
 <body>
 
@@ -306,6 +380,9 @@
     <div class="faq-item"><h3>Can I keep multiple Supabase projects awake?</h3><p>Yes. SupaWake supports unlimited projects per account. Add as many as you need — each one is pinged independently on its own schedule.</p></div>
   
   </div>
+
+ 
+
   <footer class="footer">
   <span class="footer-copy">© <span id="copy-year"></span> SupaWake. All rights reserved.</span>
   <span class="footer-credit">Created by <a href="https://markohio.github.io" target="_blank" rel="noopener">Mark Ohio</a></span>
@@ -356,6 +433,20 @@
       <p>No projects yet.<br/>Add your first Supabase project above<br/>and SupaWake will keep it awake.</p>
     </div>
   </main>
+
+<!-- DANGER ZONE -->
+<div class="danger-zone">
+  <div class="danger-zone-title">⚠ Danger Zone</div>
+  <div class="danger-zone-sub">
+    Permanently delete your account and all your projects from SupaWake.
+    This action cannot be undone. Your actual Supabase projects are not affected.
+  </div>
+  <button class="delete-account-btn" onclick="openDeleteAccountModal()">
+    Delete My Account
+  </button>
+</div>
+
+
   <footer class="footer">
   <span class="footer-copy">© <span id="copy-year"></span> SupaWake. All rights reserved.</span>
   <span class="footer-credit">Created by <a href="https://markohio.github.io" target="_blank" rel="noopener">Mark Ohio</a></span>
@@ -413,7 +504,33 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
     </div>
   </div>
 
-
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-overlay" id="delete-account-modal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Delete your account?</div>
+    <div class="modal-body">
+      This will permanently delete all your projects from SupaWake and remove
+      your account. Your actual Supabase databases are not affected.<br/><br/>
+      To confirm, type exactly:
+    </div>
+    <input
+      class="confirm-phrase-input"
+      id="delete-confirm-input"
+      type="text"
+      placeholder="I love SupaWake"
+      oninput="checkDeletePhrase()"
+      autocomplete="off"
+    />
+    <div class="phrase-hint">Type <strong>I love SupaWake</strong> exactly as shown</div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="modal-cancel" onclick="closeDeleteAccountModal()">Cancel</button>
+      <button class="modal-confirm" id="delete-account-confirm-btn" disabled onclick="deleteAccount()">
+        Delete Forever
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ AD BANNER ══ -->
 <div id="ad-banner">
@@ -583,8 +700,8 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, onSnapshot, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, reauthenticateWithPopup, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, onSnapshot, serverTimestamp, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // ── REPLACE WITH YOUR FIREBASE CONFIG ──
@@ -938,9 +1055,60 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
 </script>
 
 <script>
+    window.openDeleteAccountModal = () => {
+    document.getElementById("delete-confirm-input").value = "";
+    document.getElementById("delete-account-confirm-btn").disabled = true;
+    document.getElementById("delete-account-modal").classList.add("open");
+  };
+
+  window.closeDeleteAccountModal = () => {
+    document.getElementById("delete-account-modal").classList.remove("open");
+  };
+
+  window.checkDeletePhrase = () => {
+    const val = document.getElementById("delete-confirm-input").value;
+    document.getElementById("delete-account-confirm-btn").disabled =
+      val !== "I love SupaWake";
+  };
+
+  window.deleteAccount = async () => {
+    const btn = document.getElementById("delete-account-confirm-btn");
+    btn.disabled = true;
+    btn.textContent = "Deleting…";
+
+    try {
+      // Step 1 — re-authenticate silently
+      await reauthenticateWithPopup(currentUser, provider);
+
+      // Step 2 — delete all Firestore projects
+      const q = query(collection(db, "projects"), where("uid", "==", currentUser.uid));
+      const snap = await getDocs(q);
+      const deletions = snap.docs.map(d => deleteDoc(doc(db, "projects", d.id)));
+      await Promise.all(deletions);
+
+      // Step 3 — delete Firebase Auth account
+      await deleteUser(currentUser);
+
+      // Step 4 — redirect to landing
+      closeDeleteAccountModal();
+      showToast("Account deleted. Sorry to see you go.", "success");
+      setTimeout(() => location.reload(), 1500);
+
+    } catch (err) {
+      console.error("Delete account error:", err);
+      btn.disabled = false;
+      btn.textContent = "Delete Forever";
+      showToast("Deletion failed. Please try again.", "error");
+    }
+  };
+</script>
+
+<script>
   document.querySelectorAll("#copy-year").forEach(el => {
     el.textContent = new Date().getFullYear();
   });
 </script>
+
+
 </body>
 </html>

@@ -2,6 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://markohio.github.io/supawake/sitemap.xml
-
-
-

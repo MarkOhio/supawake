@@ -221,10 +221,20 @@
     .toast.info    { border-color:var(--warning); color:var(--warning); }
 
     /* ── AD BANNER ── */
-    #ad-banner { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; overflow:none; }
-    #ad-banner .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
-
-    /* ── ANIMATIONS ── */
+    .banner-slot { position:fixed; bottom:0; left:0; right:0; height:80px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; overflow:none; }
+    .banner-slot .ad-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; position:absolute; top:6px; left:12px; }
+    /* Banner ad slot — sits just below the header */
+  .banner-slot {
+    width: 100%;
+    background: #1a1a1a;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #2a2a2a;
+    overflow: hidden;
+    }
+    /* ──  ANIMATIONS ── */
     @keyframes fadeIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     @keyframes slideIn { from{opacity:0;transform:translateY(8px)}  to{opacity:1;transform:translateY(0)} }
     @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
@@ -343,17 +353,7 @@
 }
 .phrase-hint strong { color: var(--text); font-weight: 500; }
 
-    /* Banner ad slot — sits just below the header */
-  .banner-slot {
-    width: 100%;
-    background: #1a1a1a;
-    min-height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid #2a2a2a;
-    overflow: hidden;
-    }
+    
   </style>
 </head>
 <body>
@@ -547,7 +547,7 @@ GRANT EXECUTE ON FUNCTION public.supawake_ping() TO anon;</pre></div>
 <!-- ══ AD BANNER ══ -->
 <!-- Banner ad slot -->
 <div class="banner-slot">
-  <div data-ad="banner" style="width:100%;"></div>
+  <div class="ad-label" data-ad="banner" style="width:100%;"></div>
 </div>
 
 <div id="toast" class="toast"></div>
